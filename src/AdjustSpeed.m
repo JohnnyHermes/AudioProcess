@@ -10,6 +10,7 @@ function output = AdjustSpeed(ori_data,fs,speed_val)
 
 %% 基本参数设置
 wlen=240;                                 % 窗长
+window=hamming(wlen);                     % 设置窗函数
 inc=80;                                   % 帧长
 overlap=wlen-inc;                         % 重叠长度
 tempr1=(0:overlap-1)'/overlap;            % 斜三角窗函数w1
@@ -19,12 +20,12 @@ miniL=10;                                 % 有话段最短帧数
 mnlong=5;                                 % 元音主体最短帧数
 ThrC=[10 15];                             % 阈值
 p=12;                                     % LPC阶次
-idx=0;                                  % 初始化index
+idx=0;                                    % 初始化idx
 zint=zeros(p,1);                          % z变换系数
 %% 原始数据预处理
 ori_data=ori_data-mean(ori_data);         % 去除直流分量
 tmp_data=ori_data/max(abs(ori_data));     % 归一化
-X=enframe(tmp_data,wlen,inc)';            % 对数据进行分帧处理
+X=enframe(tmp_data,window,inc)';          % 对数据进行分帧处理
 N=length(tmp_data);                       % 语音数据长度
 fn=size(X,2);                             % 帧数
 %% 计算每帧的预测系数和信号增益
@@ -38,6 +39,7 @@ end
 [Dpitch,~,~,SF,~,~,~,~,~]=...
     Ext_F0ztms(tmp_data,fs,wlen,inc,T1,r2,miniL,mnlong,ThrC,0);
 %% LSP参数的提取
+% 为方便后续对预测参数的内插，首先将LPC的ar转换成LSP的lsf，再内插，最后逆变换回ar，这样比较方便
 for i=1 : fn
     a=AR_coeff(:,i);                     % 取来本帧的预测系数
     lsf=ar2lsf(a);                       % 调用ar2lsf函数求出lsf

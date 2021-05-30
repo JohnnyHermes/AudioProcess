@@ -10,6 +10,7 @@ function output = AdjustTune(ori_data,fs,Tune_val)
 
 %% 基本参数设置
 wlen=240;                                 % 窗长
+window=hamming(wlen);                     % 设置窗函数
 inc=80;                                   % 帧长
 overlap=wlen-inc;                         % 重叠长度
 tempr1=(0:overlap-1)'/overlap;            % 斜三角窗函数w1
@@ -19,12 +20,12 @@ miniL=10;                                 % 有话段最短帧数
 mnlong=5;                                 % 元音主体最短帧数
 ThrC=[10 15];                             % 阈值
 p=12;                                     % LPC阶次
-idx=0;                                  % 初始化index
+idx=0;                                    % 初始化index
 zint=zeros(p,1);                          % z变换系数
 %% 原始数据预处理
 ori_data=ori_data-mean(ori_data);         % 去除直流分量
 tmp_data=ori_data/max(abs(ori_data));     % 归一化
-X=enframe(tmp_data,wlen,inc)';            % 对数据进行分帧处理
+X=enframe(tmp_data,window,inc)';          % 对数据进行分帧处理
 N=length(tmp_data);                       % 语音数据长度
 fn=size(X,2);                             % 帧数
 rate = 2^(Tune_val/12);                   % 根据十二平均律计算相应的频率倍数
@@ -43,23 +44,23 @@ if rate>1, sign=-1; else sign=1; end      % 根据升调还是降调确定顺逆
 lmin=floor(fs/450);                       % 基音周期的最小值
 lmax=floor(fs/60);                        % 基音周期的最大值
 deltaOMG = sign*100*2*pi/fs;              % 根值顺时针或逆时针旋转量dθ
-Dpitch_new=Dpitch/rate;                      % 增减后的基音周期
-Dfreq_new=Dfreq*rate;                        % 增减后的基音频率
+Dpitch_new=Dpitch/rate;                   % 增减后的基音周期
+Dfreq_new=Dfreq*rate;                     % 增减后的基音频率
 %% 利用调整后的数据进行语音合成
 for i=1 : fn
-    a=AR_coeff(:,i);                      % 取得本帧的AR系数
+    a=AR_coeff(:,i);                      % 取得本帧的预测系数
     sigma=sqrt(Gain(i));                  % 取得本帧的增益系数
 
-    if SF(i)==0                           % 无话帧
+    if SF(i)==0                           % 如果是无话帧
         excitation=randn(wlen,1);         % 产生白噪声
         [synt_frame,zint]=filter(sigma,a,excitation,zint);
-    else                                  % 有话帧
-        PT=floor(Dpitch_new(i));             % 把周期值变为整数
+    else                                  % 如果是有话帧
+        PT=floor(Dpitch_new(i));          % 把周期值变为整数
         if PT<lmin, PT=lmin; end          % 判断修改后的周期值有否超限
         if PT>lmax, PT=lmax; end
         ft=roots(a);                      % 对预测系数求根
         ft1=ft;
-%增加共振峰频率，实轴上方的根顺时针转，下方的根逆时针转，求出新的根值
+        %增加共振峰频率，实轴上方的根顺时针转，下方的根逆时针转，求出新的根值
         for k=1 : p
             if imag(ft(k))>0
                 ft1(k) = ft(k)*exp(1i*deltaOMG);
