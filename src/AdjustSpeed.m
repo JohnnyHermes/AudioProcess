@@ -64,8 +64,6 @@ for i=1:fn1             % 分别对每帧进行语音合成
         exc_syn1(mod(1:idx+wlen,PT)==0)=1;% 在基音周期的位置产生脉冲，幅值为1
         exc_syn2=exc_syn1(idx+1:idx+inc); % 计算帧移inc区间内的脉冲个数
         index=find(exc_syn2==1);
-        disp(length(exc_syn1));
-        disp(idx+wlen);
         excitation=exc_syn1(idx+1:idx+wlen);% 这一帧的激励脉冲源
         
         if isempty(index)                 % 帧移inc区间内没有脉冲
