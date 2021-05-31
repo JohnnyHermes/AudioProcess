@@ -73,6 +73,8 @@ classdef MainApp < matlab.apps.AppBase
             app.RecordObj= audiorecorder(app.fs,16,1);
             app.Play.Enable = 'off';
             app.Save.Enable = 'off';
+            app.Button1.Enable = 'off';
+            app.Button2.Enable = 'off';
         end
 
         % Value changed function: Record
@@ -97,6 +99,8 @@ classdef MainApp < matlab.apps.AppBase
                 app.Erase.Enable = 'on';
                 app.Save.Enable = 'on';
                 app.Play.Enable = 'on';
+                app.Button1.Enable = 'on';
+                app.Button2.Enable = 'on';
             end
         end
 
@@ -109,6 +113,8 @@ classdef MainApp < matlab.apps.AppBase
             app.TimeAxis = zeros(1,1);
             app.Play.Enable = 'off';
             app.Save.Enable = 'off';
+            app.Button1.Enable = 'off';
+            app.Button2.Enable = 'off';
         end
 
         % Button pushed function: Play
@@ -373,7 +379,7 @@ classdef MainApp < matlab.apps.AppBase
             % Create InfoLabel
             app.InfoLabel = uilabel(app.RightPanel);
             app.InfoLabel.Position = [19 1 162 22];
-            app.InfoLabel.Text = 'Author:洪世杰         Ver 1.0.0';
+            app.InfoLabel.Text = 'Author:洪世杰         Ver 1.0.2';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
