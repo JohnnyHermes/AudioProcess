@@ -1,4 +1,4 @@
-function output = PowerSpectrumSubtraction(ori_data,snr)
+function output = AddNoise(ori_data,snr)
 %%
 %函数功能：叠加一个信噪比为snr的高斯白噪声到信号中
 %输入：
